@@ -11,5 +11,6 @@ namespace OfficeSphere.Services.Interfaces
         bool DeleteOffice(int id);
         List<Office> GetOfficesByCity(string city);
         bool UpdateOfficeRegion(int branchId, string region);
+        OfficeEcoSystem GetOfficeEcoSystem(int officeId);
     }
 }

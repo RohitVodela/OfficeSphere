@@ -5,6 +5,15 @@ namespace OfficeSphere.Services.Implementations
 {
     public class OfficeService : IOfficeService
     {
+        private readonly IBranchService _branchService;
+        private readonly IEmployeeService _employeeService;
+
+        public OfficeService(IBranchService branchService, IEmployeeService employeeService)
+        {
+            _branchService = branchService;
+            _employeeService = employeeService;
+        }
+
         private static readonly List<Office> _offices = new List<Office>
         {
             new Office { Id = 1, Name = "Arizona Intl.", Address = "123 Main St", City = "New York", State = "NY", ZipCode = "10001", OfficeRegion = "Northeast" },
@@ -69,6 +78,31 @@ namespace OfficeSphere.Services.Implementations
         public List<Office> GetOfficesByCity(string city)
         {
             return _offices.Where(o => o.City.Equals(city, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        public OfficeEcoSystem GetOfficeEcoSystem(int officeId)
+        {
+            var office = GetOfficeById(officeId);
+            if (office == null)
+            {
+                return null;
+            }
+
+            // Get all branches and filter them based on city (assuming branches in the same city as the office)
+            var branches = _branchService.GetAllBranches()
+                .Where(b => b.City.Equals(office.City, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            // Get all employees (assuming employees are distributed across all offices)
+            // In a real application, we would filter based on office assignment
+            var employees = _employeeService.GetAllEmployees();
+
+            return new OfficeEcoSystem
+            {
+                Office = office,
+                BranchDetails = branches,
+                Employees = employees
+            };
         }
     }
 }

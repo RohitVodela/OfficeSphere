@@ -94,5 +94,17 @@ namespace OfficeSphere.Controllers
 
             return Ok();
         }
+
+        // GET: api/Office/{id}/ecosystem
+        [HttpGet("{id}/ecosystem")]
+        public ActionResult<OfficeEcoSystem> GetOfficeEcoSystem(int id)
+        {
+            var ecosystem = _officeService.GetOfficeEcoSystem(id);
+            if (ecosystem == null || ecosystem.Office == null)
+            {
+                return NotFound();
+            }
+            return ecosystem;
+        }
     }
 }
