@@ -7,8 +7,8 @@ namespace OfficeSphere.Services.Implementations
     {
         private static readonly List<Office> _offices = new List<Office>
         {
-            new Office { Id = 1, Name = "Arizona Intl.", Address = "123 Main St", City = "New York", State = "NY", ZipCode = "10001" },
-            new Office { Id = 2, Name = "Florida Intl..", Address = "456 Elm St", City = "Los Angeles", State = "CA", ZipCode = "90001" }
+            new Office { Id = 1, Name = "Arizona Intl.", Address = "123 Main St", City = "New York", State = "NY", ZipCode = "10001", OfficeRegion = "Northeast" },
+            new Office { Id = 2, Name = "Florida Intl..", Address = "456 Elm St", City = "Los Angeles", State = "CA", ZipCode = "90001", OfficeRegion = "West" }
         };
 
         public List<Office> GetAllOffices()
@@ -40,6 +40,18 @@ namespace OfficeSphere.Services.Implementations
             existingOffice.City = office.City;
             existingOffice.State = office.State;
             existingOffice.ZipCode = office.ZipCode;
+            existingOffice.OfficeRegion = office.OfficeRegion;
+            return true;
+        }
+
+        public bool UpdateOfficeRegion(int branchId, string region)
+        {
+            var office = _offices.Find(o => o.Id == branchId);
+            if (office == null)
+            {
+                return false;
+            }
+            office.OfficeRegion = region;
             return true;
         }
 

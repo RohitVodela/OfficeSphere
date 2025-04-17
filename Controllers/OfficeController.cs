@@ -77,5 +77,22 @@ namespace OfficeSphere.Controllers
             
             return offices;
         }
+
+        // PATCH: api/Office/{id}/region
+        [HttpPatch("{id}/region")]
+        public IActionResult UpdateOfficeRegion(int id, [FromBody] string region)
+        {
+            if (string.IsNullOrWhiteSpace(region))
+            {
+                return BadRequest("Region cannot be empty");
+            }
+
+            if (!_officeService.UpdateOfficeRegion(id, region))
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
     }
 }
