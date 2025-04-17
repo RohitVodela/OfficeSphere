@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeSphere.Models;
+using OfficeSphere.Services.Interfaces;
 
 namespace OfficeSphere.Controllers
 {
@@ -7,24 +8,25 @@ namespace OfficeSphere.Controllers
     [ApiController]
     public class OfficeController : Controller
     {
-        private static readonly List<Office> _offices = new List<Office>
+        private readonly IOfficeService _officeService;
+
+        public OfficeController(IOfficeService officeService)
         {
-            new Office { Id = 1, Name = "Arizona Intl.", Address = "123 Main St", City = "New York", State = "NY", ZipCode = "10001" },
-            new Office { Id = 2, Name = "Florida Intl..", Address = "456 Elm St", City = "Los Angeles", State = "CA", ZipCode = "90001" }
-        };
+            _officeService = officeService;
+        }
 
         // GET: api/Office
         [HttpGet]
         public ActionResult<IEnumerable<Office>> GetOffices()
         {
-            return _offices;
+            return _officeService.GetAllOffices();
         }
 
         // GET: api/Office/5
         [HttpGet("{id}")]
         public ActionResult<Office> GetOffice(int id)
         {
-            var office = _offices.Find(o => o.Id == id);
+            var office = _officeService.GetOfficeById(id);
             if (office == null)
             {
                 return NotFound();
@@ -36,25 +38,18 @@ namespace OfficeSphere.Controllers
         [HttpPost]
         public ActionResult<Office> PostOffice(Office office)
         {
-            office.Id = _offices.Count > 0 ? _offices.Max(o => o.Id) + 1 : 1;
-            _offices.Add(office);
-            return CreatedAtAction(nameof(GetOffice), new { id = office.Id }, office);
+            var addedOffice = _officeService.AddOffice(office);
+            return CreatedAtAction(nameof(GetOffice), new { id = addedOffice.Id }, addedOffice);
         }
 
         // PUT: api/Office/5
         [HttpPut("{id}")]
         public IActionResult PutOffice(int id, Office office)
         {
-            var existingOffice = _offices.Find(o => o.Id == id);
-            if (existingOffice == null)
+            if (!_officeService.UpdateOffice(id, office))
             {
                 return NotFound();
             }
-            existingOffice.Name = office.Name;
-            existingOffice.Address = office.Address;
-            existingOffice.City = office.City;
-            existingOffice.State = office.State;
-            existingOffice.ZipCode = office.ZipCode;
             return NoContent();
         }
 
@@ -62,12 +57,10 @@ namespace OfficeSphere.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteOffice(int id)
         {
-            var office = _offices.Find(o => o.Id == id);
-            if (office == null)
+            if (!_officeService.DeleteOffice(id))
             {
                 return NotFound();
             }
-            _offices.Remove(office);
             return NoContent();
         }
 
@@ -75,9 +68,9 @@ namespace OfficeSphere.Controllers
         [HttpGet("city/{city}")]
         public ActionResult<IEnumerable<Office>> GetOfficesByCity(string city)
         {
-            var offices = _offices.Where(o => o.City.Equals(city, StringComparison.OrdinalIgnoreCase)).ToList();
+            var offices = _officeService.GetOfficesByCity(city);
             
-            if (offices.Count == 0)
+            if (!offices.Any())
             {
                 return NotFound();
             }

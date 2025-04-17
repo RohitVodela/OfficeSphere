@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeSphere.Models;
-using System.Xml.Serialization;
+using OfficeSphere.Services.Interfaces;
 
 namespace OfficeSphere.Controllers
 {
@@ -8,24 +8,25 @@ namespace OfficeSphere.Controllers
     [ApiController]
     public class TeamController : Controller
     {
-        private static readonly List<Team> _teams = new List<Team>
+        private readonly ITeamService _teamService;
+
+        public TeamController(ITeamService teamService)
         {
-            new Team { Id = 1, Name = "Development Team", EmployeeNames = new List<string> { "John Doe", "Jane Smith" } },
-            new Team { Id = 2, Name = "Marketing Team", EmployeeNames = new List<string> { "Alice Johnson", "Bob Brown" } }
-        };
+            _teamService = teamService;
+        }
 
         // GET: api/Team
         [HttpGet]
         public ActionResult<IEnumerable<Team>> GetTeams()
         {
-            return _teams;
+            return _teamService.GetAllTeams();
         }
 
         // GET: api/Team/5
         [HttpGet("{id}")]
         public ActionResult<Team> GetTeam(int id)
         {
-            var team = _teams.Find(t => t.Id == id);
+            var team = _teamService.GetTeamById(id);
             if (team == null)
             {
                 return NotFound();
@@ -37,22 +38,18 @@ namespace OfficeSphere.Controllers
         [HttpPost]
         public ActionResult<Team> PostTeam(Team team)
         {
-            team.Id = _teams.Count > 0 ? _teams.Max(t => t.Id) + 1 : 1;
-            _teams.Add(team);
-            return CreatedAtAction(nameof(GetTeam), new { id = team.Id }, team);
+            var addedTeam = _teamService.AddTeam(team);
+            return CreatedAtAction(nameof(GetTeam), new { id = addedTeam.Id }, addedTeam);
         }
 
         // PUT: api/Team/5
         [HttpPut("{id}")]
         public IActionResult PutTeam(int id, Team team)
         {
-            var existingTeam = _teams.Find(t => t.Id == id);
-            if (existingTeam == null)
+            if (!_teamService.UpdateTeam(id, team))
             {
                 return NotFound();
             }
-            existingTeam.Name = team.Name;
-            existingTeam.EmployeeNames = team.EmployeeNames;
             return NoContent();
         }
 
@@ -60,12 +57,10 @@ namespace OfficeSphere.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteTeam(int id)
         {
-            var team = _teams.Find(t => t.Id == id);
-            if (team == null)
+            if (!_teamService.DeleteTeam(id))
             {
                 return NotFound();
             }
-            _teams.Remove(team);
             return NoContent();
         }
     }

@@ -14,6 +14,13 @@ namespace OfficeSphere
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Register services in DI container
+            builder.Services.AddScoped<OfficeSphere.Services.Interfaces.IEmployeeService, OfficeSphere.Services.Implementations.EmployeeService>();
+            builder.Services.AddScoped<OfficeSphere.Services.Interfaces.IBranchService, OfficeSphere.Services.Implementations.BranchService>();
+            builder.Services.AddScoped<OfficeSphere.Services.Interfaces.IDepartmentService, OfficeSphere.Services.Implementations.DepartmentService>();
+            builder.Services.AddScoped<OfficeSphere.Services.Interfaces.ITeamService, OfficeSphere.Services.Implementations.TeamService>();
+            builder.Services.AddScoped<OfficeSphere.Services.Interfaces.IOfficeService, OfficeSphere.Services.Implementations.OfficeService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

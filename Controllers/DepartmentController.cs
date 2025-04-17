@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeSphere.Models;
+using OfficeSphere.Services.Interfaces;
 
 namespace OfficeSphere.Controllers
 {
@@ -7,24 +8,25 @@ namespace OfficeSphere.Controllers
     [ApiController]
     public class DepartmentController : Controller
     {
-        private static readonly List<Department> _departments = new List<Department>
+        private readonly IDepartmentService _departmentService;
+
+        public DepartmentController(IDepartmentService departmentService)
         {
-            new Department { Id = 1, Name = "HR", Description = "Human Resources" },
-            new Department { Id = 2, Name = "IT", Description = "Information Technology" }
-        };
+            _departmentService = departmentService;
+        }
 
         // GET: api/Department
         [HttpGet]
         public ActionResult<IEnumerable<Department>> GetDepartments()
         {
-            return _departments;
+            return _departmentService.GetAllDepartments();
         }
 
         // GET: api/Department/5
         [HttpGet("{id}")]
         public ActionResult<Department> GetDepartment(int id)
         {
-            var department = _departments.Find(d => d.Id == id);
+            var department = _departmentService.GetDepartmentById(id);
             if (department == null)
             {
                 return NotFound();
@@ -36,22 +38,18 @@ namespace OfficeSphere.Controllers
         [HttpPost]
         public ActionResult<Department> PostDepartment(Department department)
         {
-            department.Id = _departments.Count > 0 ? _departments.Max(d => d.Id) + 1 : 1;
-            _departments.Add(department);
-            return CreatedAtAction(nameof(GetDepartment), new { id = department.Id }, department);
+            var addedDepartment = _departmentService.AddDepartment(department);
+            return CreatedAtAction(nameof(GetDepartment), new { id = addedDepartment.Id }, addedDepartment);
         }
 
         // PUT: api/Department/5
         [HttpPut("{id}")]
         public IActionResult PutDepartment(int id, Department department)
         {
-            var existingDepartment = _departments.Find(d => d.Id == id);
-            if (existingDepartment == null)
+            if (!_departmentService.UpdateDepartment(id, department))
             {
                 return NotFound();
             }
-            existingDepartment.Name = department.Name;
-            existingDepartment.Description = department.Description;
             return NoContent();
         }
 
@@ -59,12 +57,10 @@ namespace OfficeSphere.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteDepartment(int id)
         {
-            var department = _departments.Find(d => d.Id == id);
-            if (department == null)
+            if (!_departmentService.DeleteDepartment(id))
             {
                 return NotFound();
             }
-            _departments.Remove(department);
             return NoContent();
         }
     }

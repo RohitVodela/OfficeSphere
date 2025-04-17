@@ -1,5 +1,6 @@
-﻿﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿﻿using Microsoft.AspNetCore.Mvc;
 using OfficeSphere.Models;
+using OfficeSphere.Services.Interfaces;
 
 namespace OfficeSphere.Controllers
 {
@@ -7,37 +8,33 @@ namespace OfficeSphere.Controllers
     [ApiController]
     public class EmployeeController : Controller
     {
-        private static readonly List<Employee> _employees = new List<Employee>
+        private readonly IEmployeeService _employeeService;
+
+        public EmployeeController(IEmployeeService employeeService)
         {
-            new Employee { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Department = "IT" },
-            new Employee { Id = 2, FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com", Department = "HR" }
-        };
+            _employeeService = employeeService;
+        }
 
 
         // GET: api/Employee
         [HttpGet]
         public ActionResult<IEnumerable<Employee>> GetEmployees()
         {
-            return _employees;
+            return _employeeService.GetAllEmployees();
         }
 
         // GET: api/Employee/SortedUnique
         [HttpGet("SortedUnique")]
         public ActionResult<IEnumerable<Employee>> GetSortedUniqueEmployees()
         {
-            // Get distinct employees based on Id and LastName, then sort by FirstName
-            return _employees
-                .GroupBy(e => new { e.Id, e.LastName })
-                .Select(g => g.First())
-                .OrderBy(e => e.FirstName)
-                .ToList();
+            return _employeeService.GetSortedUniqueEmployees();
         }
 
         // GET: api/Employee/5
         [HttpGet("{id}")]
         public ActionResult<Employee> GetEmployee(int id)
         {
-            var employee = _employees.Find(e => e.Id == id);
+            var employee = _employeeService.GetEmployeeById(id);
             if (employee == null)
             {
                 return NotFound();
@@ -49,23 +46,18 @@ namespace OfficeSphere.Controllers
         [HttpPost]
         public ActionResult<Employee> PostEmployee(Employee employee)
         {
-            _employees.Add(employee);
-            return CreatedAtAction(nameof(GetEmployee), new { id = employee.Id }, employee);
+            var addedEmployee = _employeeService.AddEmployee(employee);
+            return CreatedAtAction(nameof(GetEmployee), new { id = addedEmployee.Id }, addedEmployee);
         }
 
         // PUT: api/Employee/5
         [HttpPut("{id}")]
         public IActionResult PutEmployee(int id, Employee employee)
         {
-            var existingEmployee = _employees.Find(e => e.Id == id);
-            if (existingEmployee == null)
+            if (!_employeeService.UpdateEmployee(id, employee))
             {
                 return NotFound();
             }
-            existingEmployee.FirstName = employee.FirstName;
-            existingEmployee.LastName = employee.LastName;
-            existingEmployee.Email = employee.Email;
-            existingEmployee.Department = employee.Department;
             return NoContent();
         }
 
@@ -73,12 +65,10 @@ namespace OfficeSphere.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteEmployee(int id)
         {
-            var employee = _employees.Find(e => e.Id == id);
-            if (employee == null)
+            if (!_employeeService.DeleteEmployee(id))
             {
                 return NotFound();
             }
-            _employees.Remove(employee);
             return NoContent();
         }
 
@@ -86,20 +76,17 @@ namespace OfficeSphere.Controllers
         [HttpPost("CalculateSalary")]
         public ActionResult<decimal> CalculateSalary([FromBody] Employee employee)
         {
-            employee.CalculateSalary();
-            return employee.Salary;
+            return _employeeService.CalculateEmployeeSalary(employee);
         }
 
         // PUT: api/Employee/UpdateSalary
         [HttpPut("UpdateSalary")]
         public IActionResult UpdateSalary([FromBody] Employee employee)
         {
-            var existingEmployee = _employees.Find(e => e.Id == employee.Id);
-            if (existingEmployee == null)
+            if (!_employeeService.UpdateEmployeeSalary(employee))
             {
                 return NotFound();
             }
-            existingEmployee.Salary = employee.Salary;
             return NoContent();
         }
 
@@ -107,16 +94,10 @@ namespace OfficeSphere.Controllers
         [HttpGet("Search/{name}")]
         public ActionResult<IEnumerable<Employee>> SearchEmployeesByName(string name)
         {
-            var employees = _employees.Where(e =>
-                e.FirstName.ToLower().Contains(name.ToLower()) ||
-                e.LastName.ToLower().Contains(name.ToLower())).ToList();
+            var employees = _employeeService.SearchEmployeesByName(name);
             if (!employees.Any())
             {
                 return NotFound();
-            }
-            foreach (var employee in employees)
-            {
-                employee.CalculateSalary();
             }
             return employees;
         }
@@ -125,14 +106,10 @@ namespace OfficeSphere.Controllers
         [HttpGet("Role/{role}")]
         public ActionResult<IEnumerable<Employee>> GetEmployeesByRole(string role)
         {
-            var employees = _employees.Where(e => e.Role.ToLower() == role.ToLower()).ToList();
+            var employees = _employeeService.GetEmployeesByRole(role);
             if (!employees.Any())
             {
                 return NotFound();
-            }
-            foreach (var employee in employees)
-            {
-                employee.CalculateSalary();
             }
             return employees;
         }
@@ -141,14 +118,10 @@ namespace OfficeSphere.Controllers
         [HttpGet("Department/{department}")]
         public ActionResult<IEnumerable<Employee>> GetEmployeesByDepartment(string department)
         {
-            var employees = _employees.Where(e => e.Department.ToLower() == department.ToLower()).ToList();
+            var employees = _employeeService.GetEmployeesByDepartment(department);
             if (!employees.Any())
             {
                 return NotFound();
-            }
-            foreach (var employee in employees)
-            {
-                employee.CalculateSalary();
             }
             return employees;
         }
