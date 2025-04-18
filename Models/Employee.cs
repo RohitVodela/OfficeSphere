@@ -1,4 +1,4 @@
-﻿﻿﻿﻿namespace OfficeSphere.Models
+﻿﻿namespace OfficeSphere.Models
 {
     public class Employee
     {
@@ -6,10 +6,19 @@
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public string Department { get; set; }
         public string Role { get; set; }
         public int YearsOfExperience { get; set; }
         public decimal Salary { get; set; }
+
+        // Foreign keys
+        public int DepartmentId { get; set; }
+        public int TeamId { get; set; }
+        public int BranchId { get; set; }
+        
+        // Navigation properties
+        public Department Department { get; set; }
+        public Team Team { get; set; }
+        public Branch Branch { get; set; }
 
         public void CalculateSalary()
         {

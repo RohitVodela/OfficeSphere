@@ -4,6 +4,8 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<string> EmployeeNames { get; set; } = new List<string>();
+        
+        // Navigation property - collection of employees in this team
+        public List<Employee> Employees { get; set; } = new List<Employee>();
     }
 }

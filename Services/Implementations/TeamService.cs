@@ -7,8 +7,8 @@ namespace OfficeSphere.Services.Implementations
     {
         private static readonly List<Team> _teams = new List<Team>
         {
-            new Team { Id = 1, Name = "Development Team", EmployeeNames = new List<string> { "John Doe", "Jane Smith" } },
-            new Team { Id = 2, Name = "Marketing Team", EmployeeNames = new List<string> { "Alice Johnson", "Bob Brown" } }
+            new Team { Id = 1, Name = "Development Team" },
+            new Team { Id = 2, Name = "Marketing Team" }
         };
 
         public List<Team> GetAllTeams()
@@ -36,7 +36,8 @@ namespace OfficeSphere.Services.Implementations
                 return false;
             }
             existingTeam.Name = team.Name;
-            existingTeam.EmployeeNames = team.EmployeeNames;
+            // Note: We don't update Employees collection directly from team update
+            // as this would be managed through the Employee-Team relationship
             return true;
         }
 

@@ -1,4 +1,4 @@
-﻿﻿﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using OfficeSphere.Models;
 using OfficeSphere.Services.Interfaces;
 
@@ -114,11 +114,23 @@ namespace OfficeSphere.Controllers
             return employees;
         }
 
-        // GET: api/Employee/Department/{department}
-        [HttpGet("Department/{department}")]
-        public ActionResult<IEnumerable<Employee>> GetEmployeesByDepartment(string department)
+        // GET: api/Employee/Department/{departmentId}
+        [HttpGet("Department/{departmentId}")]
+        public ActionResult<IEnumerable<Employee>> GetEmployeesByDepartment(int departmentId)
         {
-            var employees = _employeeService.GetEmployeesByDepartment(department);
+            var employees = _employeeService.GetEmployeesByDepartment(departmentId);
+            if (!employees.Any())
+            {
+                return NotFound();
+            }
+            return employees;
+        }
+
+        // GET: api/Employee/Branch/{branchId}
+        [HttpGet("Branch/{branchId}")]
+        public ActionResult<IEnumerable<Employee>> GetEmployeesByBranch(int branchId)
+        {
+            var employees = _employeeService.GetEmployeesByBranch(branchId);
             if (!employees.Any())
             {
                 return NotFound();
