@@ -13,5 +13,6 @@ namespace OfficeSphere.Services.Interfaces
         bool UpdateOfficeRegion(int branchId, string region);
         OfficeEcoSystem GetOfficeEcoSystem(int officeId);
         decimal GetOfficeExpense(int officeId);
+        List<OfficeExpenseDTO> GetAllOfficeExpenses();
     }
 }

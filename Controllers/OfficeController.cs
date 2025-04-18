@@ -120,5 +120,19 @@ namespace OfficeSphere.Controllers
             decimal totalExpense = _officeService.GetOfficeExpense(id);
             return Ok(totalExpense);
         }
+        
+        // GET: api/Office/expenses
+        [HttpGet("expenses")]
+        public ActionResult<IEnumerable<OfficeExpenseDTO>> GetAllOfficeExpenses()
+        {
+            var expenses = _officeService.GetAllOfficeExpenses();
+            
+            if (expenses == null || !expenses.Any())
+            {
+                return NotFound("No office expenses found");
+            }
+            
+            return Ok(expenses);
+        }
     }
 }
