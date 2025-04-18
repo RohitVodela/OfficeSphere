@@ -12,5 +12,6 @@ namespace OfficeSphere.Services.Interfaces
         List<Office> GetOfficesByCity(string city);
         bool UpdateOfficeRegion(int branchId, string region);
         OfficeEcoSystem GetOfficeEcoSystem(int officeId);
+        decimal GetOfficeExpense(int officeId);
     }
 }

@@ -104,5 +104,16 @@ namespace OfficeSphere.Services.Implementations
                 Employees = employees
             };
         }
+
+        public decimal GetOfficeExpense(int officeId)
+        {
+            var officeEcosystem = GetOfficeEcoSystem(officeId);
+            if (officeEcosystem == null || officeEcosystem.Employees == null)
+            {
+                return 0;
+            }
+            
+            return officeEcosystem.Employees.Sum(e => e.Salary);
+        }
     }
 }

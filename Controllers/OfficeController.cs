@@ -106,5 +106,19 @@ namespace OfficeSphere.Controllers
             }
             return ecosystem;
         }
+
+        // GET: api/Office/{id}/expense
+        [HttpGet("{id}/expense")]
+        public ActionResult<decimal> GetOfficeExpense(int id)
+        {
+            var office = _officeService.GetOfficeById(id);
+            if (office == null)
+            {
+                return NotFound();
+            }
+            
+            decimal totalExpense = _officeService.GetOfficeExpense(id);
+            return Ok(totalExpense);
+        }
     }
 }
