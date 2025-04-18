@@ -7,8 +7,26 @@ namespace OfficeSphere.Services.Implementations
     {
         private static readonly List<Employee> _employees = new List<Employee>
         {
-            new Employee { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Department = "IT" },
-            new Employee { Id = 2, FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com", Department = "HR" }
+            new Employee { 
+                Id = 1, 
+                FirstName = "John", 
+                LastName = "Doe", 
+                Email = "john.doe@example.com", 
+                DepartmentId = 2,  // IT department
+                TeamId = 1,
+                BranchId = 1,
+                Role = "Developer"
+            },
+            new Employee { 
+                Id = 2, 
+                FirstName = "Jane", 
+                LastName = "Smith", 
+                Email = "jane.smith@example.com", 
+                DepartmentId = 1,  // HR department
+                TeamId = 2,
+                BranchId = 1,
+                Role = "Manager"
+            }
         };
 
         public List<Employee> GetAllEmployees()
@@ -46,7 +64,10 @@ namespace OfficeSphere.Services.Implementations
             existingEmployee.FirstName = employee.FirstName;
             existingEmployee.LastName = employee.LastName;
             existingEmployee.Email = employee.Email;
-            existingEmployee.Department = employee.Department;
+            existingEmployee.DepartmentId = employee.DepartmentId;
+            existingEmployee.TeamId = employee.TeamId;
+            existingEmployee.BranchId = employee.BranchId;
+            existingEmployee.Role = employee.Role;
             return true;
         }
 
@@ -102,9 +123,20 @@ namespace OfficeSphere.Services.Implementations
             return employees;
         }
 
-        public List<Employee> GetEmployeesByDepartment(string department)
+        public List<Employee> GetEmployeesByDepartment(int departmentId)
         {
-            var employees = _employees.Where(e => e.Department.ToLower() == department.ToLower()).ToList();
+            var employees = _employees.Where(e => e.DepartmentId == departmentId).ToList();
+            
+            foreach (var employee in employees)
+            {
+                employee.CalculateSalary();
+            }
+            return employees;
+        }
+
+        public List<Employee> GetEmployeesByBranch(int branchId)
+        {
+            var employees = _employees.Where(e => e.BranchId == branchId).ToList();
             
             foreach (var employee in employees)
             {

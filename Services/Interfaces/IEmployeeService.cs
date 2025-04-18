@@ -15,6 +15,7 @@ namespace OfficeSphere.Services.Interfaces
         bool UpdateEmployeeSalary(Employee employee);
         List<Employee> SearchEmployeesByName(string name);
         List<Employee> GetEmployeesByRole(string role);
-        List<Employee> GetEmployeesByDepartment(string department);
+        List<Employee> GetEmployeesByDepartment(int departmentId);
+        List<Employee> GetEmployeesByBranch(int branchId);
     }
 }
