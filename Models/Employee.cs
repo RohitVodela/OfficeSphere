@@ -1,4 +1,4 @@
-﻿﻿namespace OfficeSphere.Models
+﻿﻿﻿namespace OfficeSphere.Models
 {
     public class Employee
     {
@@ -20,22 +20,53 @@
         public Team Team { get; set; }
         public Branch Branch { get; set; }
 
-        public void CalculateSalary()
+        public void CalculateSalary(string teamName = null)
         {
+            // Base calculation based on role and experience
+            decimal baseSalary;
             switch (Role)
             {
                 case "Manager":
-                    Salary = 5000 + (YearsOfExperience * 1000);
+                    baseSalary = 5000 + (YearsOfExperience * 1000);
                     break;
                 case "Developer":
-                    Salary = 4000 + (YearsOfExperience * 800);
+                    baseSalary = 4000 + (YearsOfExperience * 800);
                     break;
                 case "Designer":
-                    Salary = 3000 + (YearsOfExperience * 700);
+                    baseSalary = 3000 + (YearsOfExperience * 700);
                     break;
                 default:
-                    Salary = 2000 + (YearsOfExperience * 500);
+                    baseSalary = 2000 + (YearsOfExperience * 500);
                     break;
+            }
+            
+            // Apply team-based salary adjustments
+            if (teamName != null)
+            {
+                switch (teamName)
+                {
+                    case "Development Team":
+                        // Greater than 10000
+                        Salary = Math.Max(10001, baseSalary);
+                        break;
+                    case "Marketing Team":
+                        // Greater than 5000 and less than 8000
+                        if (baseSalary <= 5000)
+                            Salary = 5001;
+                        else if (baseSalary >= 8000)
+                            Salary = 7999;
+                        else
+                            Salary = baseSalary;
+                        break;
+                    default:
+                        // Basic salary of 7000 for any other team
+                        Salary = 7000;
+                        break;
+                }
+            }
+            else
+            {
+                Salary = baseSalary;
             }
         }
     }

@@ -5,6 +5,12 @@ namespace OfficeSphere.Services.Implementations
 {
     public class EmployeeService : IEmployeeService
     {
+        private readonly ITeamService _teamService;
+
+        public EmployeeService(ITeamService teamService)
+        {
+            _teamService = teamService;
+        }
         private static readonly List<Employee> _employees = new List<Employee>
         {
             new Employee { 
@@ -31,21 +37,39 @@ namespace OfficeSphere.Services.Implementations
 
         public List<Employee> GetAllEmployees()
         {
+            foreach (var employee in _employees)
+            {
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
+            }
             return _employees;
         }
 
         public List<Employee> GetSortedUniqueEmployees()
         {
-            return _employees
+            var employees = _employees
                 .GroupBy(e => new { e.Id, e.LastName })
                 .Select(g => g.First())
                 .OrderBy(e => e.FirstName)
                 .ToList();
+                
+            foreach (var employee in employees)
+            {
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
+            }
+            return employees;
         }
 
         public Employee GetEmployeeById(int id)
         {
-            return _employees.Find(e => e.Id == id);
+            var employee = _employees.Find(e => e.Id == id);
+            if (employee != null)
+            {
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
+            }
+            return employee;
         }
 
         public Employee AddEmployee(Employee employee)
@@ -84,7 +108,8 @@ namespace OfficeSphere.Services.Implementations
 
         public decimal CalculateEmployeeSalary(Employee employee)
         {
-            employee.CalculateSalary();
+            var team = _teamService.GetTeamById(employee.TeamId);
+            employee.CalculateSalary(team?.Name);
             return employee.Salary;
         }
 
@@ -107,7 +132,8 @@ namespace OfficeSphere.Services.Implementations
             
             foreach (var employee in employees)
             {
-                employee.CalculateSalary();
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
             }
             return employees;
         }
@@ -118,7 +144,8 @@ namespace OfficeSphere.Services.Implementations
             
             foreach (var employee in employees)
             {
-                employee.CalculateSalary();
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
             }
             return employees;
         }
@@ -129,7 +156,8 @@ namespace OfficeSphere.Services.Implementations
             
             foreach (var employee in employees)
             {
-                employee.CalculateSalary();
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
             }
             return employees;
         }
@@ -140,7 +168,8 @@ namespace OfficeSphere.Services.Implementations
             
             foreach (var employee in employees)
             {
-                employee.CalculateSalary();
+                var team = _teamService.GetTeamById(employee.TeamId);
+                employee.CalculateSalary(team?.Name);
             }
             return employees;
         }
